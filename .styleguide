@@ -26,6 +26,7 @@ includeOtherLibs {
   ^drake/
   ^hal/
   ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore
@@ -35,5 +36,6 @@ includeOtherLibs {
   ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
   ^wpimath/
 }

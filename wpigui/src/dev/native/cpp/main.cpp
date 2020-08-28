@@ -5,20 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "wpigui.h"
 
-#include <imgui.h>
-
-namespace halsimgui {
-
-// get distance^2 between two ImVec's
-inline float GetDistSquared(const ImVec2& a, const ImVec2& b) {
-  float deltaX = b.x - a.x;
-  float deltaY = b.y - a.y;
-  return deltaX * deltaX + deltaY * deltaY;
+int main() {
+  wpi::gui::CreateContext();
+  wpi::gui::Initialize("Hello World", 1024, 768);
+  wpi::gui::Main();
 }
-
-// maximize fit while preserving aspect ratio
-void MaxFit(ImVec2* min, ImVec2* max, float width, float height);
-
-}  // namespace halsimgui
