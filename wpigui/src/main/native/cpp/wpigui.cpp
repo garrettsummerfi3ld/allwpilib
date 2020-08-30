@@ -17,6 +17,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
 #include <implot.h>
+#include <stb_image.h>
 
 #include "wpigui_internal.h"
 
@@ -35,6 +36,10 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
     gContext->width = width;
     gContext->height = height;
   }
+}
+
+static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  PlatformFramebufferSizeChanged(width, height);
 }
 
 static void WindowMaximizeCallback(GLFWwindow* window, int maximized) {
@@ -196,6 +201,7 @@ bool gui::Initialize(const char* title, int width, int height) {
   // Set window callbacks
   glfwGetWindowSize(gContext->window, &gContext->width, &gContext->height);
   glfwSetWindowSizeCallback(gContext->window, WindowSizeCallback);
+  glfwSetFramebufferSizeCallback(gContext->window, FramebufferSizeCallback);
   glfwSetWindowMaximizeCallback(gContext->window, WindowMaximizeCallback);
   glfwSetWindowPosCallback(gContext->window, WindowPosCallback);
 
@@ -271,7 +277,10 @@ void gui::CommonRenderFrame() {
   ImGui::Render();
 }
 
-void gui::Exit() { gContext->exit = true; }
+void gui::Exit() {
+  if (!gContext) return;
+  gContext->exit = true;
+}
 
 void gui::AddInit(std::function<void()> initialize) {
   if (initialize) gContext->initializers.emplace_back(std::move(initialize));
@@ -351,6 +360,76 @@ void gui::EmitViewMenu() {
       ImGui::EndMenu();
     }
     ImGui::EndMenu();
+  }
+}
+
+bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
+                                 const unsigned char* data, int len) {
+  // Load from memory
+  int width2 = 0;
+  int height2 = 0;
+  unsigned char* imgData =
+      stbi_load_from_memory(data, len, &width2, &height2, nullptr, 4);
+  if (!data) return false;
+
+  if (width2 == width && height2 == height)
+    UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
+  else
+    *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
+
+  stbi_image_free(imgData);
+
+  return true;
+}
+
+bool gui::CreateTextureFromFile(const char* filename, ImTextureID* out_texture,
+                                int* out_width, int* out_height) {
+  // Load from file
+  int width = 0;
+  int height = 0;
+  unsigned char* data = stbi_load(filename, &width, &height, nullptr, 4);
+  if (!data) return false;
+
+  *out_texture = CreateTexture(kPixelRGBA, width, height, data);
+  if (out_width) *out_width = width;
+  if (out_height) *out_height = height;
+
+  stbi_image_free(data);
+
+  return true;
+}
+
+bool gui::CreateTextureFromImage(const unsigned char* data, int len,
+                                 ImTextureID* out_texture, int* out_width,
+                                 int* out_height) {
+  // Load from memory
+  int width = 0;
+  int height = 0;
+  unsigned char* imgData =
+      stbi_load_from_memory(data, len, &width, &height, nullptr, 4);
+  if (!imgData) return false;
+
+  *out_texture = CreateTexture(kPixelRGBA, width, height, imgData);
+  if (out_width) *out_width = width;
+  if (out_height) *out_height = height;
+
+  stbi_image_free(imgData);
+
+  return true;
+}
+
+void gui::MaxFit(ImVec2* min, ImVec2* max, float width, float height) {
+  float destWidth = max->x - min->x;
+  float destHeight = max->y - min->y;
+  if (width == 0 || height == 0) return;
+  if (destWidth * height > destHeight * width) {
+    float outputWidth = width * destHeight / height;
+    min->x += (destWidth - outputWidth) / 2;
+    max->x -= (destWidth - outputWidth) / 2;
+  } else {
+    float outputHeight = height * destWidth / width;
+    min->y += (destHeight - outputHeight) / 2;
+    max->y -= (destHeight - outputHeight) / 2;
   }
 }
 

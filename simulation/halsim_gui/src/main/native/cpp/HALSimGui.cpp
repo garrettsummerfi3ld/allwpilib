@@ -210,6 +210,8 @@ bool HALSimGui::Initialize() {
       if ((window.posCond & ImGuiCond_FirstUseEver) != 0) {
         window.pos.x *= windowScale;
         window.pos.y *= windowScale;
+        window.size.x *= windowScale;
+        window.size.y *= windowScale;
       }
     }
   });
@@ -275,7 +277,10 @@ bool HALSimGui::Initialize() {
   return true;
 }
 
-void HALSimGui::Main(void*) { gui::Main(); }
+void HALSimGui::Main(void*) {
+  gui::Main();
+  gui::DestroyContext();
+}
 
 void HALSimGui::Exit(void*) { gui::Exit(); }
 
