@@ -4,13 +4,20 @@
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
-- [WPILib Mission](#wpilib-mission)
+- [WPILib Project](#wpilib-project)
+  - [WPILib Mission](#wpilib-mission)
 - [Building WPILib](#building-wpilib)
-    - [Requirements](#requirements)
-    - [Setup](#setup)
-    - [Building](#building)
-    - [Publishing](#publishing)
-    - [Structure and Organization](#structure-and-organization)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Building](#building)
+    - [Faster builds](#faster-builds)
+    - [Using Development Builds](#using-development-builds)
+    - [Custom toolchain location](#custom-toolchain-location)
+    - [Gazebo simulation](#gazebo-simulation)
+    - [Formatting/linting with wpiformat](#formattinglinting-with-wpiformat)
+    - [CMake](#cmake)
+  - [Publishing](#publishing)
+  - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
 
 ## WPILib Mission
@@ -23,9 +30,10 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
+- [JDK 11](https://adoptopenjdk.net/)
 - C++ compiler
     - On Linux, install GCC
-    - On Windows, install the [build tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), or install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation
+    - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - [ARM compiler toolchain](https://github.com/wpilibsuite/roborio-toolchain/releases)
     - For 2020 and beyond, use GCC version 7 or greater
@@ -64,6 +72,10 @@ There are a few tasks other than `build` available. To see them, run the meta-ta
 
 `./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
 
+### Using Development Builds
+
+Please read the documentation available [here](OtherVersions.md)
+
 ### Custom toolchain location
 
 If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
@@ -91,10 +103,15 @@ make
 ```
 
 
-### Formatting/linting with wpiformat
+### Formatting/linting
+
+#### wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
+#### Java Code Quality Tools
+
+The Java code quality tools (checkstyle, pmd, etc.) can be run with the `./gradlew javaFormat` task.
 
 ### CMake
 

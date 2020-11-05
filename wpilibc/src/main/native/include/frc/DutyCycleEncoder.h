@@ -154,6 +154,20 @@ class DutyCycleEncoder : public ErrorBase,
    */
   double GetDistance() const;
 
+  /**
+   * Get the FPGA index for the DutyCycleEncoder.
+   *
+   * @return the FPGA index
+   */
+  int GetFPGAIndex() const;
+
+  /**
+   * Get the channel of the source.
+   *
+   * @return the source channel
+   */
+  int GetSourceChannel() const;
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:
@@ -169,6 +183,7 @@ class DutyCycleEncoder : public ErrorBase,
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
+  hal::SimDouble m_simDistancePerRotation;
   hal::SimBoolean m_simIsConnected;
 };
 }  // namespace frc
